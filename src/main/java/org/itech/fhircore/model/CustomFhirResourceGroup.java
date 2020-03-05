@@ -1,6 +1,6 @@
 package org.itech.fhircore.model;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -21,6 +21,6 @@ public class CustomFhirResourceGroup extends AuditableEntity<Long> {
 	private String resourceGroupName;
 
 	@ElementCollection
-	List<ResourceType> resourceTypes;
+	Set<ResourceType> resourceTypes;
 
 }

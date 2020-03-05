@@ -1,10 +1,11 @@
 package org.itech.fhircore.service.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,21 +18,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class FhirResourceGroupServiceImpl implements FhirResourceGroupService {
 
-	public enum FhirResourceCategories {
-		// base resources
-		Base, Individuals, Entities_1, Entities_2, Workflow, Management,
-		// clinical resources
-		Clinical, Summary, Diagnostics, Medications, Care_Provision, Request_Response;
-	}
-
-	private final Map<FhirResourceCategories, List<ResourceType>> fhirCategoriesToResourceTypes;
-	private final Map<String, List<ResourceType>> defaultFhirGroupsToResourceTypes;
-	private final Map<String, List<ResourceType>> customFhirGroupsToResourceTypes;
+	private final Map<FhirResourceCategories, Set<ResourceType>> fhirCategoriesToResourceTypes;
+	private final Map<String, Set<ResourceType>> defaultFhirGroupsToResourceTypes;
+	private final Map<String, Set<ResourceType>> customFhirGroupsToResourceTypes;
 
 	public FhirResourceGroupServiceImpl(CustomFhirResourceGroupDAO customFhirResourceGroupDAO) {
 		fhirCategoriesToResourceTypes = new HashMap<>();
 
-		List<ResourceType> entity1Entries = new ArrayList<>();
+		Set<ResourceType> entity1Entries = new HashSet<>();
 		entity1Entries.add(ResourceType.Organization);
 		entity1Entries.add(ResourceType.OrganizationAffiliation);
 		entity1Entries.add(ResourceType.HealthcareService);
@@ -39,7 +33,7 @@ public class FhirResourceGroupServiceImpl implements FhirResourceGroupService {
 		entity1Entries.add(ResourceType.Location);
 		fhirCategoriesToResourceTypes.put(FhirResourceCategories.Entities_1, entity1Entries);
 
-		List<ResourceType> workflowEntries = new ArrayList<>();
+		Set<ResourceType> workflowEntries = new HashSet<>();
 		workflowEntries.add(ResourceType.Task);
 		workflowEntries.add(ResourceType.Appointment);
 		workflowEntries.add(ResourceType.AppointmentResponse);
@@ -48,14 +42,25 @@ public class FhirResourceGroupServiceImpl implements FhirResourceGroupService {
 		fhirCategoriesToResourceTypes.put(FhirResourceCategories.Workflow, workflowEntries);
 
 		fhirCategoriesToResourceTypes.put(FhirResourceCategories.Base,
-				Stream.concat(entity1Entries.stream(), workflowEntries.stream()).collect(Collectors.toList()));
+				Stream.concat(entity1Entries.stream(), workflowEntries.stream()).collect(Collectors.toSet()));
 
+		// put all fhirCategoriesToResourceTypes into the all type
+		Set<ResourceType> allEntries = new HashSet<>();
+		for (Set<ResourceType> resourceTypeList : fhirCategoriesToResourceTypes.values()
+				) {
+			allEntries.addAll(resourceTypeList);
+		}
+		fhirCategoriesToResourceTypes.put(FhirResourceCategories.All, allEntries);
+
+		// get map that uses strings instead of FhirResourceCategories
 		defaultFhirGroupsToResourceTypes = new HashMap<>();
-		for (Entry<FhirResourceCategories, List<ResourceType>> fhirCategory : fhirCategoriesToResourceTypes
+		for (Entry<FhirResourceCategories, Set<ResourceType>> fhirCategory : fhirCategoriesToResourceTypes
 				.entrySet()) {
 			defaultFhirGroupsToResourceTypes.put(fhirCategory.getKey().name(), fhirCategory.getValue());
 		}
 
+
+		// add any custom FhirResourceGroups
 		customFhirGroupsToResourceTypes = new HashMap<>();
 		for (CustomFhirResourceGroup customFhirResourceGroup : customFhirResourceGroupDAO.findAll()) {
 			customFhirGroupsToResourceTypes.put(customFhirResourceGroup.getResourceGroupName(),

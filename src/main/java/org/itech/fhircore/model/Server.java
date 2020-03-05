@@ -17,6 +17,8 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Server extends AuditableEntity<Long> {
 
+	public static final String SERVER_PATH = "/servers";
+
 	private URI serverUrl;
 
 	// persistence

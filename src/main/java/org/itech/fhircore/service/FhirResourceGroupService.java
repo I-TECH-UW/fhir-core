@@ -4,9 +4,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.hl7.fhir.r4.model.ResourceType;
-import org.itech.fhircore.service.impl.FhirResourceGroupServiceImpl.FhirResourceCategories;
 
 public interface FhirResourceGroupService {
+
+	public enum FhirResourceCategories {
+		All,
+		// base resources
+		Base, Individuals, Entities_1, Entities_2, Workflow, Management,
+		// clinical resources
+		Clinical, Summary, Diagnostics, Medications, Care_Provision, Request_Response
+	}
 
 	Map<FhirResourceCategories, List<ResourceType>> getFhirCategoriesToResourceTypes();
 
