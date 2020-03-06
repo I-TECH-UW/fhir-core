@@ -4,10 +4,12 @@ import java.net.URI;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.itech.fhircore.URIUtil;
 import org.itech.fhircore.model.base.AuditableEntity;
+import org.itech.fhircore.validation.annotation.ValidName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +26,9 @@ public class Server extends AuditableEntity<Long> {
 	// persistence
 	@Column(name = "name", unique = true, nullable = false, length = 255)
 	// validation
+	@NotBlank
 	@Size(max = 255)
+	@ValidName
 	private String name;
 
 	Server() {

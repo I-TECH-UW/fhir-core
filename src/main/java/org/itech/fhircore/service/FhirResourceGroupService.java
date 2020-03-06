@@ -1,9 +1,10 @@
 package org.itech.fhircore.service;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hl7.fhir.r4.model.ResourceType;
+import org.itech.fhircore.model.CustomFhirResourceGroup;
 
 public interface FhirResourceGroupService {
 
@@ -15,12 +16,14 @@ public interface FhirResourceGroupService {
 		Clinical, Summary, Diagnostics, Medications, Care_Provision, Request_Response
 	}
 
-	Map<FhirResourceCategories, List<ResourceType>> getFhirCategoriesToResourceTypes();
+	Map<FhirResourceCategories, Set<ResourceType>> getFhirCategoriesToResourceTypes();
 
-	Map<String, List<ResourceType>> getDefaultFhirGroupsToResourceTypes();
+	Map<String, Set<ResourceType>> getDefaultFhirGroupsToResourceTypes();
 
-	Map<String, List<ResourceType>> getCustomFhirGroupsToResourceTypes();
+	Map<String, Set<ResourceType>> getCustomFhirGroupsToResourceTypes();
 
-	Map<String, List<ResourceType>> getAllFhirGroupsToResourceTypes();
+	Map<String, Set<ResourceType>> getAllFhirGroupsToResourceTypes();
+
+	CustomFhirResourceGroup createFhirResourceGroup(String resourceGroupName, Set<ResourceType> resourceTypes);
 
 }

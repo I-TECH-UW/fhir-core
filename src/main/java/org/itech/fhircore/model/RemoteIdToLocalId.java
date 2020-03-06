@@ -10,11 +10,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.itech.fhircore.model.base.PersistenceEntity;
+import org.itech.fhircore.validation.annotation.ValidIdMap;
+import org.itech.fhircore.validation.constraint.IdMapValidator.IdType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,16 +28,25 @@ import lombok.EqualsAndHashCode;
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "server_id", "resource_type" }) })
 public class RemoteIdToLocalId extends PersistenceEntity<Long> {
 
-	@Column(name = "resource_type")
-	ResourceType resourceType;
+	// persistence
+	@Column(name = "resource_type", nullable = false, updatable = false)
+	// validation
+	@NotNull
+	private ResourceType resourceType;
 
+	// persistence
 	@ManyToOne
 	@JoinColumn(name = "server_id", nullable = false, updatable = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	Server remoteServer;
+	// validation
+	@NotNull
+	private Server remoteServer;
 
+	// persistence
 	@ElementCollection
-	Map<String, String> remoteIdToLocalIdMap;
+	// validation
+	@ValidIdMap(keyIdType = IdType.AlphaNum, valueIdType = IdType.AlphaNum)
+	private Map<String, String> remoteIdToLocalIdMap;
 
 	RemoteIdToLocalId() {
 

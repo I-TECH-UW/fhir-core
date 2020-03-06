@@ -2,12 +2,12 @@ package org.itech.fhircore.service.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.hl7.fhir.r4.model.ResourceType;
 import org.itech.fhircore.dao.CustomFhirResourceGroupDAO;
@@ -20,9 +20,11 @@ public class FhirResourceGroupServiceImpl implements FhirResourceGroupService {
 
 	private final Map<FhirResourceCategories, Set<ResourceType>> fhirCategoriesToResourceTypes;
 	private final Map<String, Set<ResourceType>> defaultFhirGroupsToResourceTypes;
-	private final Map<String, Set<ResourceType>> customFhirGroupsToResourceTypes;
+
+	private CustomFhirResourceGroupDAO customFhirResourceGroupDAO;
 
 	public FhirResourceGroupServiceImpl(CustomFhirResourceGroupDAO customFhirResourceGroupDAO) {
+		this.customFhirResourceGroupDAO = customFhirResourceGroupDAO;
 		fhirCategoriesToResourceTypes = new HashMap<>();
 
 		Set<ResourceType> entity1Entries = new HashSet<>();
@@ -59,40 +61,44 @@ public class FhirResourceGroupServiceImpl implements FhirResourceGroupService {
 			defaultFhirGroupsToResourceTypes.put(fhirCategory.getKey().name(), fhirCategory.getValue());
 		}
 
+	}
 
-		// add any custom FhirResourceGroups
-		customFhirGroupsToResourceTypes = new HashMap<>();
+	@Override
+	public Map<FhirResourceCategories, Set<ResourceType>> getFhirCategoriesToResourceTypes() {
+		return fhirCategoriesToResourceTypes.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(), e -> Set.copyOf(e.getValue())));
+	}
+
+	@Override
+	public Map<String, Set<ResourceType>> getDefaultFhirGroupsToResourceTypes() {
+		return defaultFhirGroupsToResourceTypes.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(), e -> Set.copyOf(e.getValue())));
+	}
+
+	@Override
+	public Map<String, Set<ResourceType>> getCustomFhirGroupsToResourceTypes() {
+		Map<String, Set<ResourceType>> customFhirGroupsToResourceTypes = new HashMap<>();
 		for (CustomFhirResourceGroup customFhirResourceGroup : customFhirResourceGroupDAO.findAll()) {
 			customFhirGroupsToResourceTypes.put(customFhirResourceGroup.getResourceGroupName(),
 					customFhirResourceGroup.getResourceTypes());
 		}
-
+		return StreamSupport.stream(customFhirResourceGroupDAO.findAll().spliterator(), false).collect(Collectors
+				.toMap(CustomFhirResourceGroup::getResourceGroupName, CustomFhirResourceGroup::getResourceTypes));
 	}
 
 	@Override
-	public Map<FhirResourceCategories, List<ResourceType>> getFhirCategoriesToResourceTypes() {
-		return fhirCategoriesToResourceTypes.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> List.copyOf(e.getValue())));
-	}
-
-	@Override
-	public Map<String, List<ResourceType>> getDefaultFhirGroupsToResourceTypes() {
-		return defaultFhirGroupsToResourceTypes.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> List.copyOf(e.getValue())));
-	}
-
-	@Override
-	public Map<String, List<ResourceType>> getCustomFhirGroupsToResourceTypes() {
-		return customFhirGroupsToResourceTypes.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> List.copyOf(e.getValue())));
-	}
-
-	@Override
-	public Map<String, List<ResourceType>> getAllFhirGroupsToResourceTypes() {
-		Map<String, List<ResourceType>> allFhirGroupsToResourceTypes = new HashMap<>();
+	public Map<String, Set<ResourceType>> getAllFhirGroupsToResourceTypes() {
+		Map<String, Set<ResourceType>> allFhirGroupsToResourceTypes = new HashMap<>();
 		allFhirGroupsToResourceTypes.putAll(getDefaultFhirGroupsToResourceTypes());
 		allFhirGroupsToResourceTypes.putAll(getCustomFhirGroupsToResourceTypes());
 		return allFhirGroupsToResourceTypes;
+	}
+
+	@Override
+	public CustomFhirResourceGroup createFhirResourceGroup(String resourceGroupName, Set<ResourceType> resourceTypes) {
+		CustomFhirResourceGroup newResourceGroup = new CustomFhirResourceGroup(resourceGroupName);
+		newResourceGroup.getResourceTypes().addAll(resourceTypes);
+		return customFhirResourceGroupDAO.save(newResourceGroup);
 	}
 
 }
