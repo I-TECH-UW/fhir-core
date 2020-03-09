@@ -12,5 +12,4 @@ public interface ServerService extends CrudService<Server, Long> {
 
 	void updateServerIdentifier(String oldIdentifier, String newIdentifier);
 
-
 }

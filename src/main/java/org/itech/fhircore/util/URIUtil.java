@@ -1,4 +1,4 @@
-package org.itech.fhircore;
+package org.itech.fhircore.util;
 
 import java.net.URI;
 import java.util.Map;

@@ -1,6 +1,7 @@
 package org.itech.fhircore.web.dto;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,6 @@ public class CustomFhirResourceGroupDTO {
 	private String resourceGroupName;
 
 	@NotNull
-	private Set<ResourceType> resourceTypes;
+	private Map<ResourceType, Map<String, List<String>>> resourceTypesSearchParams;
 
 }

@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import org.itech.fhircore.URIUtil;
 import org.itech.fhircore.model.base.AuditableEntity;
+import org.itech.fhircore.util.URIUtil;
 import org.itech.fhircore.validation.annotation.ValidName;
 
 import lombok.Data;

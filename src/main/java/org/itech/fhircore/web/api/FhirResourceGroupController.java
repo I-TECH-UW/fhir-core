@@ -7,8 +7,8 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
-import org.hl7.fhir.r4.model.ResourceType;
 import org.itech.fhircore.model.CustomFhirResourceGroup;
+import org.itech.fhircore.model.ResourceSearchParam;
 import org.itech.fhircore.service.FhirResourceGroupService;
 import org.itech.fhircore.web.dto.CustomFhirResourceGroupDTO;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +29,17 @@ public class FhirResourceGroupController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Map<String, Set<ResourceType>>> getAllFhirResourceGroups() {
+	public ResponseEntity<Map<String, Set<ResourceSearchParam>>> getAllFhirResourceGroups() {
 		return ResponseEntity.ok(fhirResourceGroupService.getAllFhirGroupsToResourceTypes());
 	}
 
 	@GetMapping("/custom")
-	public ResponseEntity<Map<String, Set<ResourceType>>> getCustomFhirResourceGroups() {
+	public ResponseEntity<Map<String, Set<ResourceSearchParam>>> getCustomFhirResourceGroups() {
 		return ResponseEntity.ok(fhirResourceGroupService.getCustomFhirGroupsToResourceTypes());
 	}
 
 	@GetMapping("/default")
-	public ResponseEntity<Map<String, Set<ResourceType>>> getDefaultFhirResourceGroups() {
+	public ResponseEntity<Map<String, Set<ResourceSearchParam>>> getDefaultFhirResourceGroups() {
 		return ResponseEntity.ok(fhirResourceGroupService.getDefaultFhirGroupsToResourceTypes());
 	}
 
@@ -47,7 +47,7 @@ public class FhirResourceGroupController {
 	public ResponseEntity<CustomFhirResourceGroup> createCustomFhirResourceGroup(
 			@RequestBody @Valid CustomFhirResourceGroupDTO dto) throws URISyntaxException {
 		CustomFhirResourceGroup resourceGroup = fhirResourceGroupService
-				.createFhirResourceGroup(dto.getResourceGroupName(), dto.getResourceTypes());
+				.createFhirResourceGroup(dto.getResourceGroupName(), dto.getResourceTypesSearchParams());
 		return ResponseEntity.created(new URI("/fhirResourceGroups/custom/" + resourceGroup.getId()))
 				.body(resourceGroup);
 	}
